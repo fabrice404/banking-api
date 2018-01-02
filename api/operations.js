@@ -24,6 +24,7 @@ const getUncheckedOperations = (event, context, callback) => {
   knex.select()
     .from('operation')
     .where('checked', false)
+    .orderBy('date')
     .asCallback((error, operations) => {
       if (error) {
         return console.error(error);
