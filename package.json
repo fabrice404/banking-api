@@ -1,0 +1,12 @@
+{
+  "name": "banking-api",
+  "version": "1.0.0",
+  "description": "Banking API",
+  "dependencies": {
+    "knex": "^0.14.2",
+    "pg": "^7.4.0"
+  },
+  "devDependencies": {},
+  "author": "Fabrice Lamant",
+  "license": "ISC"
+}

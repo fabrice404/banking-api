@@ -1,0 +1,85 @@
+service: banking-api
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  timeout: 5
+  stage: dev
+  region: eu-west-1
+  environment: '${file(.env.yml):${self:custom.stage}}'
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "ec2:CreateNetworkInterface"
+        - "ec2:DescribeNetworkInterfaces"
+        - "ec2:DetachNetworkInterface"
+        - "ec2:DeleteNetworkInterface"
+      Resource: "*"
+  vpc: '${file(.env.yml):${self:custom.stage}-vpc}'
+
+custom:
+  stage: '${opt:stage, self:provider.stage}'
+
+functions:
+  ###################################
+  # accounts
+  ###################################
+  accountsList:
+    handler: api/accounts.list
+    events:
+      - http:
+          path: api/accounts
+          method: get
+
+  accountsGet:
+    handler: api/accounts.get
+    events:
+      - http:
+          path: api/accounts/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
+
+  ###################################
+  # categories
+  ###################################
+  categoriesList:
+    handler: api/categories.list
+    events:
+      - http:
+          path: api/categories
+          method: get
+
+  categoriesGet:
+    handler: api/categories.get
+    events:
+      - http:
+          path: api/categories/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
+
+  ###################################
+  # operations
+  ###################################
+  operationsList:
+    handler: api/operations.list
+    events:
+      - http:
+          path: api/operations
+          method: get
+
+  operationsGet:
+    handler: api/categories.get
+    events:
+      - http:
+          path: api/operations/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
