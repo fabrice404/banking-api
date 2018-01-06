@@ -4,9 +4,13 @@
   "description": "Banking API",
   "dependencies": {
     "knex": "^0.14.2",
-    "pg": "^7.4.0"
+    "knexnest": "^0.4.1",
+    "pg": "^7.4.0",
+    "validate": "^3.0.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "standard": "^10.0.3"
+  },
   "author": "Fabrice Lamant",
   "license": "ISC"
 }

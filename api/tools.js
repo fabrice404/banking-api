@@ -1,12 +1,12 @@
-module.exports.buildResponse = (body) => {
+module.exports.buildResponse = (body, statusCode = 200) => {
   return {
-    statusCode: 200,
+    statusCode: statusCode,
     headers: {
-      "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-      "Access-Control-Allow-Credentials": true // Required for cookies, authorization headers with HTTPS
+      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+      'Access-Control-Allow-Credentials': true // Required for cookies, authorization headers with HTTPS
     },
-    body: body,
-  };
+    body: body
+  }
 }
 
 module.exports.initKnex = () => {
@@ -19,5 +19,5 @@ module.exports.initKnex = () => {
       password: process.env.PG_PWD,
       database: process.env.PG_DB
     }
-  });
+  })
 }

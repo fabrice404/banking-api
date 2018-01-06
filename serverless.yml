@@ -30,6 +30,7 @@ functions:
       - http:
           path: api/accounts
           method: get
+          cors: true
 
   accountsGet:
     handler: api/accounts.get
@@ -37,6 +38,7 @@ functions:
       - http:
           path: api/accounts/{id}
           method: get
+          cors: true
           request:
             parameters:
               paths:
@@ -51,6 +53,7 @@ functions:
       - http:
           path: api/categories
           method: get
+          cors: true
 
   categoriesGet:
     handler: api/categories.get
@@ -58,6 +61,7 @@ functions:
       - http:
           path: api/categories/{id}
           method: get
+          cors: true
           request:
             parameters:
               paths:
@@ -72,13 +76,47 @@ functions:
       - http:
           path: api/operations
           method: get
+          cors: true
 
   operationsGet:
-    handler: api/categories.get
+    handler: api/operations.get
     events:
       - http:
           path: api/operations/{id}
           method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  operationsPost:
+    handler: api/operations.post
+    events:
+      - http:
+          path: api/operations
+          method: post
+          cors: true
+
+  operationsPut:
+    handler: api/operations.put
+    events:
+      - http:
+          path: api/operations/{id}
+          method: put
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  operationsPatch:
+    handler: api/operations.patch
+    events:
+      - http:
+          path: api/operations/{id}
+          method: patch
+          cors: true
           request:
             parameters:
               paths:
