@@ -1,7 +1,15 @@
 const tools = require('./tools')
 
 module.exports.list = (event, context, callback) => {
-  getUncheckedOperations(event, context, callback)
+  let type = event.queryStringParameters.t || 'u';
+  switch (type) {
+    case 'am':
+      getMonthOperations(event, context, callback);
+      break;
+    case 'u':
+    default:
+      getUncheckedOperations(event, context, callback)
+  }
 }
 
 module.exports.get = (event, context, callback) => {
@@ -184,6 +192,50 @@ const getUncheckedOperations = (event, context, callback) => {
     .innerJoin('account AS a', 'a.id', 'o.accountId')
     .innerJoin('category AS c', 'c.id', 'o.categoryId')
     .where('o.checked', false)
+    .orderBy('o.date')
+
+  let knexnest = require('knexnest')
+  knexnest(query)
+    .then(operations => {
+      const response = tools.buildResponse(JSON.stringify(operations))
+      callback(null, response)
+      return knex.destroy()
+    })
+}
+
+const getMonthOperations = (event, context, callback) => {
+
+  let dateStart = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1);
+  let dateEnd = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1);
+  dateEnd.setMonth(dateEnd.getMonth() + 1)
+  dateEnd.setDate(dateEnd.getDate() - 1)
+  console.log(dateStart, dateEnd)
+  let knex = tools.initKnex()
+  let query = knex.select(
+      'o.id         AS _id',
+      'o.name       AS _name',
+      'o.checked    AS _checked',
+      'o.date       AS _date',
+      'o.amount     AS _amount',
+      'o.accountId  AS _accountId',
+      'o.categoryId AS _categoryId',
+
+      'a.id         AS _account_id',
+      'a.name       AS _account_name',
+      'a.balance    AS _account_balance',
+      'a.currency   AS _account_currency',
+      'a.color      AS _account_color',
+      'a.icon       AS _account_icon',
+      'a.order      AS _account_order',
+
+      'c.id         AS _category_id',
+      'c.name       AS _category_name'
+    )
+    .from('operation AS o')
+    .innerJoin('account AS a', 'a.id', 'o.accountId')
+    .innerJoin('category AS c', 'c.id', 'o.categoryId')
+    .whereBetween('o.date', [dateStart, dateEnd])
+    .andWhere('o.accountId', event.queryStringParameters.a)
     .orderBy('o.date')
 
   let knexnest = require('knexnest')
