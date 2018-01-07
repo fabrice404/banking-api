@@ -1,7 +1,10 @@
 const tools = require('./tools')
 
 module.exports.list = (event, context, callback) => {
-  let type = event.queryStringParameters.t || 'u';
+  let type = 'u';
+  if (event != null && event.queryStringParameters != null && event.queryStringParameters.t != null) {
+    type = event.queryStringParameters.t
+  }
   switch (type) {
     case 'am':
       getMonthOperations(event, context, callback);
@@ -204,12 +207,10 @@ const getUncheckedOperations = (event, context, callback) => {
 }
 
 const getMonthOperations = (event, context, callback) => {
-
   let dateStart = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1);
   let dateEnd = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1);
   dateEnd.setMonth(dateEnd.getMonth() + 1)
   dateEnd.setDate(dateEnd.getDate() - 1)
-  console.log(dateStart, dateEnd)
   let knex = tools.initKnex()
   let query = knex.select(
       'o.id         AS _id',
