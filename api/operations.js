@@ -1,14 +1,14 @@
 const tools = require('./tools')
 
 module.exports.list = (event, context, callback) => {
-  let type = 'u';
+  let type = 'u'
   if (event != null && event.queryStringParameters != null && event.queryStringParameters.t != null) {
     type = event.queryStringParameters.t
   }
   switch (type) {
     case 'am':
-      getMonthOperations(event, context, callback);
-      break;
+      getMonthOperations(event, context, callback)
+      break
     case 'u':
     default:
       getUncheckedOperations(event, context, callback)
@@ -22,7 +22,7 @@ module.exports.get = (event, context, callback) => {
 module.exports.post = (event, context, callback) => {
   let knex = tools.initKnex()
   let body = JSON.parse(event.body)
-  let schema = require('validate');
+  let schema = require('validate')
   let constraints = schema({
     name: {
       type: 'string',
@@ -75,7 +75,7 @@ module.exports.post = (event, context, callback) => {
 module.exports.put = (event, context, callback) => {
   let knex = tools.initKnex()
   let body = JSON.parse(event.body)
-  let schema = require('validate');
+  let schema = require('validate')
   let constraints = schema({
     name: {
       type: 'string',
@@ -117,8 +117,8 @@ module.exports.put = (event, context, callback) => {
       .where('operation.id', event.pathParameters.id)
       .returning('id')
       .then(ids => {
-        knex.destroy();
-        getOperation(event, context, callback);
+        knex.destroy()
+        getOperation(event, context, callback)
       })
   }
 }
@@ -207,8 +207,8 @@ const getUncheckedOperations = (event, context, callback) => {
 }
 
 const getMonthOperations = (event, context, callback) => {
-  let dateStart = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1);
-  let dateEnd = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1);
+  let dateStart = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1)
+  let dateEnd = new Date(event.queryStringParameters.y, event.queryStringParameters.m - 1, 1)
   dateEnd.setMonth(dateEnd.getMonth() + 1)
   dateEnd.setDate(dateEnd.getDate() - 1)
   let knex = tools.initKnex()
