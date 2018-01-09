@@ -121,3 +121,22 @@ functions:
             parameters:
               paths:
                 id: true
+
+  ###################################
+  # statistics
+  ###################################
+  operations_dailyBalance:
+    handler: api/statistics.operations_dailyBalance
+    events:
+      - http:
+          path: api/statistics/operations/dailyBalance
+          method: get
+          cors: true
+
+  account_dayBalance:
+    handler: api/statistics.account_dayBalance
+    events:
+      - http:
+          path: api/statistics/account/dayBalance
+          method: get
+          cors: true
