@@ -1,4 +1,4 @@
-const tools = require('./tools')
+const tools = require('../tools')
 
 module.exports.list = (event, context, callback) => {
   let knex = tools.initKnex()
