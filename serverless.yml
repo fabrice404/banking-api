@@ -140,3 +140,11 @@ functions:
           path: api/statistics/account/dayBalance
           method: get
           cors: true
+
+  ###################################
+  # cron
+  ###################################
+  operations_cron:
+    handler: cron/operations.month
+    events:
+      - schedule: cron(0 6 25 * ? *)
