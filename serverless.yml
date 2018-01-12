@@ -16,6 +16,7 @@ provider:
         - "ec2:DeleteNetworkInterface"
       Resource: "*"
   vpc: '${file(.env.yml):${self:custom.stage}-vpc}'
+  apiKeys: '${file(.env.yml):${self:custom.stage}-apiKeys}'
 
 custom:
   stage: '${opt:stage, self:provider.stage}'
@@ -31,6 +32,7 @@ functions:
           path: api/accounts
           method: get
           cors: true
+          private: true
 
   accountsGet:
     handler: api/accounts.get
@@ -39,6 +41,7 @@ functions:
           path: api/accounts/{id}
           method: get
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -54,6 +57,7 @@ functions:
           path: api/categories
           method: get
           cors: true
+          private: true
 
   categoriesGet:
     handler: api/categories.get
@@ -62,6 +66,7 @@ functions:
           path: api/categories/{id}
           method: get
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -77,6 +82,7 @@ functions:
           path: api/operations
           method: get
           cors: true
+          private: true
 
   operationsGet:
     handler: api/operations.get
@@ -85,6 +91,7 @@ functions:
           path: api/operations/{id}
           method: get
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -97,6 +104,7 @@ functions:
           path: api/operations
           method: post
           cors: true
+          private: true
 
   operationsPut:
     handler: api/operations.put
@@ -105,6 +113,7 @@ functions:
           path: api/operations/{id}
           method: put
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -117,6 +126,7 @@ functions:
           path: api/operations/{id}
           method: patch
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -132,6 +142,7 @@ functions:
           path: api/statistics/operations/dailyBalance
           method: get
           cors: true
+          private: true
 
   account_dayBalance:
     handler: api/statistics.account_dayBalance
@@ -140,6 +151,7 @@ functions:
           path: api/statistics/account/dayBalance
           method: get
           cors: true
+          private: true
 
   ###################################
   # cron
