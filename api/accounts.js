@@ -2,7 +2,7 @@ const tools = require('../tools')
 
 module.exports.list = (event, context, callback) => {
   let knex = tools.initKnex()
-  knex.select(knex.raw('a.*, coalesce(p.pending, 0) AS pending'))
+  knex.select()
     .from('account AS a')
     .leftJoin('account_pending AS p', 'a.id', 'p.accountId')
     .whereNot('a.balance', 0)
