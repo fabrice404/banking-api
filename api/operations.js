@@ -9,6 +9,9 @@ module.exports.list = (event, context, callback) => {
     case 'am':
       getMonthOperations(event, context, callback)
       break
+    case 'd':
+      getDownloadedOperations(event, context, callback)
+      break
     case 'u':
     default:
       getUncheckedOperations(event, context, callback)
@@ -49,9 +52,7 @@ module.exports.post = (event, context, callback) => {
       required: true,
       message: 'The date is required.'
     }
-  }, {
-    typecast: true
-  })
+  }, { typecast: true })
   let errors = constraints.validate(body)
   if (errors.length) {
     const response = tools.buildResponse(JSON.stringify(errors), 400)
@@ -102,9 +103,7 @@ module.exports.put = (event, context, callback) => {
       required: true,
       message: 'The date is required.'
     }
-  }, {
-    typecast: true
-  })
+  }, { typecast: true })
   let errors = constraints.validate(body)
   if (errors.length) {
     const response = tools.buildResponse(JSON.stringify(errors), 400)
@@ -163,6 +162,14 @@ module.exports.patch = (event, context, callback) => {
           getOperation(event, context, callback)
         }
       })
+  } else if (body.did != null) {
+    knex('operation_downloaded')
+      .where('id', body.did)
+      .update({ operationId: event.pathParameters.id })
+      .then(count => {
+        knex.destroy()
+        getOperation(event, context, callback)
+      })
   } else {
     knex.destroy()
     getOperation(event, context, callback)
@@ -172,30 +179,61 @@ module.exports.patch = (event, context, callback) => {
 const getUncheckedOperations = (event, context, callback) => {
   let knex = tools.initKnex()
   let query = knex.select(
-      'o.id         AS _id',
-      'o.name       AS _name',
-      'o.checked    AS _checked',
-      'o.date       AS _date',
-      'o.amount     AS _amount',
-      'o.accountId  AS _accountId',
-      'o.categoryId AS _categoryId',
+    'o.id         AS _id',
+    'o.name       AS _name',
+    'o.checked    AS _checked',
+    'o.date       AS _date',
+    'o.amount     AS _amount',
+    'o.accountId  AS _accountId',
+    'o.categoryId AS _categoryId',
 
-      'a.id         AS _account_id',
-      'a.name       AS _account_name',
-      'a.balance    AS _account_balance',
-      'a.currency   AS _account_currency',
-      'a.color      AS _account_color',
-      'a.icon       AS _account_icon',
-      'a.order      AS _account_order',
+    'a.id         AS _account_id',
+    'a.name       AS _account_name',
+    'a.balance    AS _account_balance',
+    'a.currency   AS _account_currency',
+    'a.color      AS _account_color',
+    'a.icon       AS _account_icon',
+    'a.order      AS _account_order',
 
-      'c.id         AS _category_id',
-      'c.name       AS _category_name'
-    )
+    'c.id         AS _category_id',
+    'c.name       AS _category_name'
+  )
     .from('operation AS o')
     .innerJoin('account AS a', 'a.id', 'o.accountId')
     .innerJoin('category AS c', 'c.id', 'o.categoryId')
     .where('o.checked', false)
     .orderBy('o.date')
+
+  let knexnest = require('knexnest')
+  knexnest(query)
+    .then(operations => {
+      const response = tools.buildResponse(JSON.stringify(operations))
+      callback(null, response)
+      return knex.destroy()
+    })
+}
+
+const getDownloadedOperations = (event, context, callback) => {
+  let knex = tools.initKnex()
+  let query = knex.select(
+    'o.id         AS _id',
+    'o.name       AS _name',
+    'o.date       AS _date',
+    'o.amount     AS _amount',
+    'o.accountId  AS _accountId',
+
+    'a.id         AS _account_id',
+    'a.name       AS _account_name',
+    'a.balance    AS _account_balance',
+    'a.currency   AS _account_currency',
+    'a.color      AS _account_color',
+    'a.icon       AS _account_icon',
+    'a.order      AS _account_order'
+  )
+    .from('operation_downloaded AS o')
+    .innerJoin('account AS a', 'a.id', 'o.accountId')
+    .whereNull('o.operationId')
+    .orderByRaw(`to_date(o.date, 'DD/MM/YYYY')`)
 
   let knexnest = require('knexnest')
   knexnest(query)
@@ -213,25 +251,25 @@ const getMonthOperations = (event, context, callback) => {
   dateEnd.setDate(dateEnd.getDate() - 1)
   let knex = tools.initKnex()
   let query = knex.select(
-      'o.id         AS _id',
-      'o.name       AS _name',
-      'o.checked    AS _checked',
-      'o.date       AS _date',
-      'o.amount     AS _amount',
-      'o.accountId  AS _accountId',
-      'o.categoryId AS _categoryId',
+    'o.id         AS _id',
+    'o.name       AS _name',
+    'o.checked    AS _checked',
+    'o.date       AS _date',
+    'o.amount     AS _amount',
+    'o.accountId  AS _accountId',
+    'o.categoryId AS _categoryId',
 
-      'a.id         AS _account_id',
-      'a.name       AS _account_name',
-      'a.balance    AS _account_balance',
-      'a.currency   AS _account_currency',
-      'a.color      AS _account_color',
-      'a.icon       AS _account_icon',
-      'a.order      AS _account_order',
+    'a.id         AS _account_id',
+    'a.name       AS _account_name',
+    'a.balance    AS _account_balance',
+    'a.currency   AS _account_currency',
+    'a.color      AS _account_color',
+    'a.icon       AS _account_icon',
+    'a.order      AS _account_order',
 
-      'c.id         AS _category_id',
-      'c.name       AS _category_name'
-    )
+    'c.id         AS _category_id',
+    'c.name       AS _category_name'
+  )
     .from('operation AS o')
     .innerJoin('account AS a', 'a.id', 'o.accountId')
     .innerJoin('category AS c', 'c.id', 'o.categoryId')
@@ -251,25 +289,25 @@ const getMonthOperations = (event, context, callback) => {
 const getOperation = (event, context, callback) => {
   let knex = tools.initKnex()
   let query = knex.select(
-      'o.id         AS _id',
-      'o.name       AS _name',
-      'o.checked    AS _checked',
-      'o.date       AS _date',
-      'o.amount     AS _amount',
-      'o.accountId  AS _accountId',
-      'o.categoryId AS _categoryId',
+    'o.id         AS _id',
+    'o.name       AS _name',
+    'o.checked    AS _checked',
+    'o.date       AS _date',
+    'o.amount     AS _amount',
+    'o.accountId  AS _accountId',
+    'o.categoryId AS _categoryId',
 
-      'a.id         AS _account_id',
-      'a.name       AS _account_name',
-      'a.balance    AS _account_balance',
-      'a.currency   AS _account_currency',
-      'a.color      AS _account_color',
-      'a.icon       AS _account_icon',
-      'a.order      AS _account_order',
+    'a.id         AS _account_id',
+    'a.name       AS _account_name',
+    'a.balance    AS _account_balance',
+    'a.currency   AS _account_currency',
+    'a.color      AS _account_color',
+    'a.icon       AS _account_icon',
+    'a.order      AS _account_order',
 
-      'c.id         AS _category_id',
-      'c.name       AS _category_name'
-    )
+    'c.id         AS _category_id',
+    'c.name       AS _category_name'
+  )
     .from('operation AS o')
     .innerJoin('account AS a', 'a.id', 'o.accountId')
     .innerJoin('category AS c', 'c.id', 'o.categoryId')
